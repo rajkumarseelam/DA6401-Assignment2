@@ -15,6 +15,8 @@ class Trainer:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model=torch.nn.DataParallel(model,device_ids = [0,1]).to(self.device)
         # self.model = model.to(self.device)
+
+        #Note I'm running the model on Kaggle which supports two gpu .. If you are running on Single device Gpu then uncomment the above mentioned self.model and comment the line where it contains nn.dataparallel
         
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -66,6 +68,7 @@ class Trainer:
         return epoch_loss, epoch_acc
     
     def validate(self):
+        #Set for evalution 
         self.model.eval()
         running_loss = 0.0
         correct = 0
@@ -101,15 +104,22 @@ class Trainer:
             
             print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc*100:.4f}")
             print(f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc*100:.4f}")
+            #Added for removing the cache
             torch.cuda.empty_cache() 
-    def confusion_matrix(self,plot=True):
+
+    def confusion_matrix(self,count,Capture_Img=True,plot=True):
+
         class_names=["Amphibia", "Animalia", "Arachnida", "Aves", "Fungi", "Insecta", "Mammalia", "Mollusca", "Plantae", "Reptilia"]
     
         confusion_matrix = np.zeros((len(class_names), len(class_names)), dtype=int)
-    
+
+        #Set for evalution 
         self.model.eval()
         correct = 0
         total = 0
+
+        captured_samples = [] 
+
         
         with torch.no_grad():
             for images, labels in tqdm(self.test_loader, desc="testing"):
@@ -120,9 +130,19 @@ class Trainer:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
                 
-    
+                # Updating Confusion Matrix
                 for true, predict in zip(labels.cpu(), predicted.cpu()):
                   confusion_matrix[true,predict] += 1
+
+                #Capture images if flag is set and count is not reached
+                if Capture_Img and len(captured_samples) < count:
+                    for i in range(images.size(0)):
+                        if len(captured_samples) >= count:
+                            break
+                        img = images[i].cpu().numpy()
+                        true_label = labels[i].item()
+                        pred_label = predicted[i].item()
+                        captured_samples.append((img, true_label, pred_label))
 
         Acc=correct/total
 
@@ -144,6 +164,27 @@ class Trainer:
             plt.savefig(Img_name)
             plt.close()
             wandb.log({"confusion_matrix": wandb.Image(Img_name)})
+
+        if Capture_Img and len(captured_samples) > 0:
+            rows = (count + 2) // 3  # Calculate rows needed (ceiling division)
+            cols = 3
+            fig, axes = plt.subplots(rows, cols, figsize=(10, 3 * rows))
+            axes_flat = axes.flatten()
+
+            for i, ax in enumerate(axes_flat):
+                ax.axis('off')
+                if i < len(captured_samples):
+                    img, true, pred = captured_samples[i]
+                    # Adjusting mean and std of data
+                    mean = np.array([0.485, 0.456, 0.406])
+                    std = np.array([0.229, 0.224, 0.225])
+                    img = img.transpose(1, 2, 0)  
+                    img = img * std + mean  # Un_normalize
+                    img = np.clip(img, 0, 1)
+                    ax.imshow(img)
+                    ax.set_title(f"True: {class_names[true]}\nPred: {class_names[pred]}")
+            plt.tight_layout()
+            plt.show()
     
         return confusion_matrix
             

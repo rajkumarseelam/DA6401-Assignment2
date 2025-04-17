@@ -1,23 +1,28 @@
 import wandb
+
+
 from model import FlexibleCNN
 from data_loader import DataLoaderHelper
-from model_train import Trainer
+from model_trainer import Trainer
 
-input_dim=(400,400)
+input_dim=(500,500)
 num_classes=10
-train_directory='/kaggle/input/cnndataset/inaturalist_12K/train'
-test_directory='/kaggle/input/cnndataset/inaturalist_12K/val'
+
+# Add your directory here 
+train_directory='/kaggle/input/cnndataset1/inaturalist_12K/train'
+test_directory='/kaggle/input/cnndataset1/inaturalist_12K/val'
+
 # Sweep configuration dictionary for wandb
 sweep_configuration = {
     'method': 'bayes',
-    'name' : 'cnn-hyperparameter-tuning',
+    'name' : 'cnn-hyperparameter-tuning_test',
     'metric': {
-      'name': 'validation_accuracy',
+      'name': 'val_accuracy',
       'goal': 'maximize'
     },
     'parameters': {
         'num_filters': {
-          'values': [[32, 32, 32, 32, 32], [32, 64, 64, 128, 128], [128, 128, 64, 64, 32], [32, 64, 128, 256, 512], [64, 128, 256, 512, 1024]]
+          'values': [[64,128,256,512, 1024], [32,32,32,32,32],[32,64,64,128,128],[128,128,64,64,32],[32,64,128,256,512]]
         },
         'filter_sizes': {
           'values': [[3,3,3,3,3], [5,5,5,5,5], [5,3,5,3,5]]
@@ -35,7 +40,7 @@ sweep_configuration = {
             'values': [1e-3, 1e-4]
         },
         'activation': {
-            'values': ['elu', 'gelu', 'mish', 'relu', 'selu', 'silu']
+            'values': ['relu', 'elu', 'selu', 'silu', 'gelu','mish']
         },
         'optimizer': {
             'values': ['nadam', 'adam', 'rmsprop']
@@ -95,6 +100,7 @@ def train_sweep(config=None):
             model=model,
             train_loader=train_loader,
             val_loader=val_loader,
+            test_loader=test_loader,
             optimizer_name=config.optimizer,
             learning_rate=config.learning_rate,
             num_epochs=10,
@@ -119,6 +125,5 @@ if __name__ == "__main__":
     
     sweep_id = wandb.sweep(sweep_configuration, project="DA6401-Assignment-2")
 
-    
     # Start sweep
-    wandb.agent(sweep_id, function=train_sweep, count=1)
+    wandb.agent(sweep_id, function=train_sweep, count=10)
