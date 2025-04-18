@@ -33,9 +33,10 @@ trainer.train()
 - Trainer function takes pretrained model , optimizer name , weight_decay, Number of epochs and the train and validation and test data loaders.
 
 
-<div style="background-color:#e7f3fe; color:#0b5394; padding:10px; border-left:6px solid #2196F3; border-radius:4px;">
- <strong>Note:</strong> train.py is the file one needs to run to see the running of the model and it takes follow arguments. For better modularity purpose Each functionality is implemented in separate files.
-</div>
+
+```text
+train.py is the file one needs to run to see the running of the model and it takes follow arguments. For better modularity purpose Each functionality is implemented in separate files.
+```
 
 
 

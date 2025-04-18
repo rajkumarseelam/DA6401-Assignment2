@@ -60,7 +60,7 @@ class DataLoaderHelper:
                                 shuffle=False, num_workers=2, pin_memory=True)
 
         test_loader = DataLoader(self.test_data, batch_size=self.batch_size,
-                                     shuffle=False, num_workers=2, pin_memory=True)
+                                     shuffle=True, num_workers=2, pin_memory=True)
       
 
         return train_loader, val_loader, test_loader

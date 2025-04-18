@@ -32,7 +32,10 @@ trainer.train()
 - Trainer function takes CNN model, optimizer name , weight_decay, Number of epochs and the train and validation and test data loaders.
 
 
+
+```text
 train.py is the file one needs to run to see the running of the model and it takes follow arguments. For better modularity purpose Each functionality is implemented in separate files.
+```
 
 
 ## Command-Line Arguments

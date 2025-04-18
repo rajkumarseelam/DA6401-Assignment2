@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     wandb.login()
     run_name="optimizer {} activation {} num_filters {} dropout {} filter_sizes {} batch_size {} augmentation {} weight_decay {} batch_norm {} ".format(
-            args.optimizer,
+            args.optimizer_name,
             args.activation,
             args.num_filters,
             args.dropout,
