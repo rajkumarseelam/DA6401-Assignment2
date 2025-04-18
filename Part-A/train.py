@@ -43,7 +43,18 @@ if __name__ == "__main__":
 
 
     wandb.login()
-    wandb.init(project=args.wandb_project,entity=args.wandb_entity)
+    run_name="optimizer {} activation {} num_filters {} dropout {} filter_sizes {} batch_size {} augmentation {} weight_decay {} batch_norm {} ".format(
+            args.optimizer,
+            args.activation,
+            args.num_filters,
+            args.dropout,
+            args.filter_sizes,
+            args.batch_size,
+            args.augmentation,
+            args.weight_decay,
+            args.batch_norm
+          )
+    wandb.init(project=args.wandb_project,entity=args.wandb_entity,name=run_name)
 
     #Loading the data
     input_val=(args.input_dim,args.input_dim)
