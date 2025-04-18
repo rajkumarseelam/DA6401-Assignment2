@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     # Added the default parameters of my best config
     parser = argparse.ArgumentParser()
-    parser.add_argument("--wandb_entity", "-we",help = "Wandb Entity rollno", default="cs24m042")
+    parser.add_argument("--wandb_entity", "-we",help = "Wandb Entity rollno", default="cs24m042-iit-madras-foundation")
     parser.add_argument("--wandb_project", "-wp",help="Project name", default="DA6401-Assignment-2")
     parser.add_argument("--num_epochs","-e", help= "Number of epochs to train CNN", type= int, default=10)
     parser.add_argument("--batch_size","-b",help="Batch size used to train CNN", type =int, default=64)
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument("--activation", "-ac",choices=['relu', 'elu', 'selu', 'silu', 'gelu','mish'], default="silu")
     parser.add_argument("--num_filters", "-nf", nargs=5, type=int, default=[128, 128, 64, 64, 32])
     parser.add_argument("--filter_sizes", "-fs", nargs=5, type=int, default=[5,5,5,5,5])
-    parser.add_argument("--input_dim", "-in", type=int, default=400)
+    parser.add_argument("--input_dim", "-in", type=int, default=224)
     parser.add_argument("--batch_norm", "-bn", default="true", choices=["true", "false"])
     parser.add_argument("--optimizer_name","-o",help="batch size is used to train neural network", default= "rmsprop", choices=['nadam', 'adam', 'rmsprop'])
     parser.add_argument("--hidden_size", "-dl", nargs=1, type=int, default=[512])
@@ -41,16 +41,18 @@ if __name__ == "__main__":
 
     num_classes=10 
 
+
     wandb.login()
-    wandb.init(project=args.wandb_project,entity=args.wandb_project)
+    wandb.init(project=args.wandb_project,entity=args.wandb_entity)
 
     #Loading the data
-    data_loader = DataLoaderHelper(train_directory,test_directory,args.input_dim,args.batch_size,augmentation)
+    input_val=(args.input_dim,args.input_dim)
+    data_loader = DataLoaderHelper(train_directory,test_directory,input_val,args.batch_size,augmentation)
 
     train_loader, val_loader,test_loader = data_loader.get_dataloaders()
 
     #Build the CNN model using pytorch as per the given requirements
-    model = FlexibleCNN(args.num_filters,args.filter_sizes,args.dropout,args.activation,batch_norm,args.input_dim,args.hidden_size,num_classes)
+    model = FlexibleCNN(args.num_filters,args.filter_sizes,args.dropout,args.activation,batch_norm,input_val,args.hidden_size,num_classes)
     
     #Intializing the train model
     trainer = Trainer(model,train_loader,val_loader,test_loader,args.optimizer_name,args.learning_rate,args.num_epochs,args.weight_decay)
@@ -59,7 +61,7 @@ if __name__ == "__main__":
     trainer.train()
 
     #Plot the confusion matrix and 3*10 images with their predicted and Actual value
-    trainer.confusion_matrix()
+    trainer.confusion_matrix(plot=False)
     #Note for the If you send plot=False parameter the plots will be logged into the wandb.
 
 
@@ -76,4 +78,4 @@ if __name__ == "__main__":
 
 
 
-    
+

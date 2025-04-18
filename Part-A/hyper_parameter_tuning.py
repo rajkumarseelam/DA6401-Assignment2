@@ -5,12 +5,13 @@ from model import FlexibleCNN
 from data_loader import DataLoaderHelper
 from model_trainer import Trainer
 
-input_dim=(500,500)
+input_dim=(400,400)
 num_classes=10
 
 # Add your directory here 
 train_directory='/kaggle/input/cnndataset1/inaturalist_12K/train'
 test_directory='/kaggle/input/cnndataset1/inaturalist_12K/val'
+epochs=10
 
 # Sweep configuration dictionary for wandb
 sweep_configuration = {
@@ -103,7 +104,7 @@ def train_sweep(config=None):
             test_loader=test_loader,
             optimizer_name=config.optimizer,
             learning_rate=config.learning_rate,
-            num_epochs=10,
+            num_epochs=epochs,
             weight_decay=config.weight_decay
         )
         
@@ -111,7 +112,7 @@ def train_sweep(config=None):
         trainer.train()
         
         # Log final metrics
-        for epoch in range(10):
+        for epoch in range(epochs):
             wandb.log({
                 'train_accuracy': trainer.train_acc_history[epoch]*100,
                 'train_loss': trainer.train_loss_history[epoch],
@@ -126,4 +127,4 @@ if __name__ == "__main__":
     sweep_id = wandb.sweep(sweep_configuration, project="DA6401-Assignment-2")
 
     # Start sweep
-    wandb.agent(sweep_id, function=train_sweep, count=10)
+    wandb.agent(sweep_id, function=train_sweep, count=1)
