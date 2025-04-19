@@ -105,5 +105,11 @@ Below are the command-line arguments supported by the script, sepcifing default 
 !python train.py -br "/kaggle/input/cnndataset1/inaturalist_12K"
 
 ```
+Note: Better login first into wandb before running train.py .
+```
+!pip install wandb
 
+import wandb
+wandb.login(key='Your key')
+```
 - If you are running on Gpu device which contains more than one, I have mentioned in model_trainer file how to utilize it's functionality.
