@@ -9,4 +9,4 @@ The goal of this assignment is twofold:
 1. **[PART-A - Training CNN from Scratch](Part-A/Readme.MD)**  
 2. **[PART-B - Fine-tuning Pre-trained Model](Part-B/Readme.MD)**  
 
-
+Note: Click the above link to redirect to particular readme files.

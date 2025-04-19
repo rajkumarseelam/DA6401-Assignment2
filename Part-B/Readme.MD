@@ -36,6 +36,8 @@ trainer.train()
 
 ```text
 train.py is the file one needs to run to see the running of the model and it takes follow arguments. For better modularity purpose Each functionality is implemented in separate files.
+
+Note: Download the data_loader.py, model.py ,model_trainer.py  files before running the train.py.
 ```
 
 
